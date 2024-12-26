@@ -19,7 +19,7 @@ En cada apartado hacer visualizaciones con matplotlib o seaborn.
 
 * 25 %:
 
-* Carga de datos: cargarlo con np.genfromtext
+* Carga de datos: cargarlo con np.genfromtext usar encoding="utf-8"
 * Media, mediana
 * Máximo y mínimo
 * histograma y curva de densidad
