@@ -24,7 +24,13 @@ IMPORTANTE: cargar el dataset desde CSV desde la carpeta Data porque tendrá nul
 
 * PARTE 2: 25 % transformaciones:
     * Uso de función apply:
-        * crear una columna price_iva a partir de la columna price que muestre el precio + IVA (21%)
+        * Crear una columna price_iva a partir de la columna price que muestre el precio + IVA (21%). 
+        * Ejemplo df['price'] * 1.21 
+
+    * Crear una columna price_discount usando apply a partir de la columna price(con lambda o def):
+        * price < 1000 and cut == 'Ideal' entonces 10 % descuento
+        * 1000 <= price <= 5000 and cut == 'Premium' entonces 15 % descuento
+        * si no entra en las condiciones sin descuento, devolver el precio original
 
     * Crear una nueva columna volumen combinando: x * y * z
 
