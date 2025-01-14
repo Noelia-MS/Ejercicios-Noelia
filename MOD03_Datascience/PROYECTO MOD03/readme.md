@@ -11,8 +11,12 @@ IMPORTANTE: cargar el dataset desde CSV desde la carpeta Data porque tendrá nul
 
     * Limpieza de valores error: 
         * hay columnas que tienen un valor '?', por tanto se deben reemplazar por un valor nan.
+    
+    * En las columnas x, y, z si el valor es cero ponerlo a nan para luego imputarlo
 
     * Cambio de tipo de dato: .astype() a numéricos y textos, por ejemplo a categorical y carat a float32 o float16
+
+    * Borrado de duplicados: drop_duplicates()
 
     * Limpieza de nulos (limpiar valores NaN):
         * Nulos en columnas continuas: mediana, media
@@ -45,7 +49,6 @@ IMPORTANTE: cargar el dataset desde CSV desde la carpeta Data porque tendrá nul
 * Outliers: Visualización Q1 y Q3 y calcular límites tukey y filtrar. Sobre la columna precio.
 
 * asimetría, curtosis y transformar datos con logaritmo o raíz cuadrada, aplicar sobre precio, visualizar el histograma y/o boxplot por tipo de corte. Opcional ajustar la escala.
-(noelia: boxplot 09.plotly) columna precio histograma antes y después o boxplot por cut. 
 
 * Discretizar la columna precio por barato, medio, caro usando la función pd.cut
 
