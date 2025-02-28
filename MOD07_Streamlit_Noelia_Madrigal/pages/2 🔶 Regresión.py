@@ -3,63 +3,91 @@ import pandas as pd
 import seaborn as sns
 import joblib
 
-
-
-@st.cache_resource
-def load_scikit_model():
-    return joblib.load('models/pipeline_regresion.joblib')
- 
 st.set_page_config(page_title='Regresión', 
                    page_icon=':large_orange_diamond:')
 
 
-st.title('Regresión')
+@st.cache_resource
+def load_scikit_model():
+    return joblib.load('./models/pipeline_regresion.joblib')
 
+model = load_scikit_model() 
+if 'predicciones_df' not in st.session_state:
+    st.session_state['predicciones_df'] = pd.DataFrame(columns=['carat', 'cut', 'color', 'clarity',
+                                        'depth', 'table', 'x', 'y', 'z', 
+                                        'precio_estimado'])
+
+st.title('Regresión')
 if st.button('Volver a inicio'):
     st.switch_page('🏠Inicio.py')
 
-# 1. Mostrar datos (opcional)
+st.header('Predicción del precio del diamante')
+
+
+# Mostrar datos
 st.write('Ejemplo de los datos')
 df= sns.load_dataset('diamonds')
-price_mean= df['price'].mean()
 st.table(df.head())
 
 
-# # 2. Formulario para predicción
-# st.header('Introduce datos para la predicción')
+# Formulario para predicción
+st.header('Introduce los datos para la predicción')
 
-# with st.form('mi_formulario'):
-#     total_bill = st.number_input('Introduce total cuenta (total_bill)',
-#                 min_value=0.0, max_value=100.00,
-#                 value=df['total_bill'].mean(),
-#                 step=1.0
-#                 )
-#     size = st.number_input(
-#     'Introduce número comensales (size)',
-#     min_value=1,
-#     value=df['size'].mode()[0],
-#     max_value=10,
-#     step=1
-#     )
-#     sex= st.radio('Introduce género (sex)', ['Male', 'Female'])
-#     smoker= st.radio('Introduce si es fumador (smoker)', ['Yes', 'No'])
-#     day= st.selectbox('Introduce día semana (day)', ['Thur', 'Fri', 'Sat', 'Sun'])
-#     time= st.radio('Introduce horario (time)', ['Lunch', 'Dinner'])
-    
-#     boton_enviar= st.form_submit_button('Enviar')
-    
-#     if boton_enviar:
-#         X_new= pd.DataFrame({
-#             'total_bill': [total_bill],
-#             'sex': [sex],
-#             'smoker': [smoker],
-#             'day': [day],
-#             'time': [time],
-#             'size': [size]
-#         })
-#         prediccion = model.predict(X_new)[0]
-#         delta_value = prediccion - tip_mean
-#         col1, col2 = st.columns(2)
-#         col1.metric('Propina estimada (predicción)', value=f'{prediccion:.2f} $', delta=f'{delta_value:.2f} $')
-#         col2.metric('Propina media', value=f'{tip_mean:.2f} $')
-        
+with st.form('mi_formulario'):
+    carat= st.number_input('Peso en quilates (carat)',
+                           min_value=0.10, max_value=5.20,
+                           value= 1.00,
+                           step= 0.01)
+    cut = st.selectbox('Calidad del corte (cut)', ['Ideal', 'Premium', 'Very Good', 'Good', 'Fair'])
+    color = st.selectbox('Grado de color (color)', ['D', 'E', 'F', 'G', 'H', 'I', 'J'])
+    clarity = st.selectbox('Grado de claridad (clarity)', ['IF', 'VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1'])
+    depth = st.number_input('Proporción de la profundidad (depth)',
+                            min_value=40.00, max_value=80.00,
+                            value=60.00,
+                            step= 0.10)
+    table = st.number_input('Mesa o superficie (table)',
+                            min_value=40.00, max_value=100.00,
+                            value= 70.00,
+                            step=0.10)
+    x= st.number_input('Ancho horizontal en mm (eje X)',
+                            min_value=1.00, max_value=20.00,
+                            value=5.50,
+                            step= 0.01)                  
+    y= st.number_input('Altura vertical en mm (eje Y)',
+                             min_value=1.00, max_value=60.00,
+                            value=5.50,
+                            step= 0.01)                        
+    z= st.number_input('Profundidad en mm (eje Z)',
+                            min_value=1.00, max_value=40.00,
+                            value=3.50,
+                            step= 0.01)                       
+          
+    boton_enviar= st.form_submit_button('Predecir', type='primary')
+
+if boton_enviar:
+    X_new = pd.DataFrame({
+        'carat': [carat],
+        'cut': [cut],
+        'color': [color],
+        'clarity': [clarity],
+        'depth': [depth],
+        'table': [table],
+        'x': [x],
+        'y': [y],
+        'z': [z]
+    })
+
+    prediccion = model.predict(X_new)[0]
+    st.metric('Precio estimado', value=f'{prediccion:.2f} $')
+    X_new['precio_estimado'] = round(prediccion,2)
+    st.session_state['predicciones_df'] = pd.concat([st.session_state['predicciones_df'], X_new],
+                                                    ignore_index=True)
+
+
+    csv = st.session_state['predicciones_df'].to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Descargar CSV de predicciones",
+        data=csv,
+        file_name='regresion_diamantes.csv',
+        mime='text/csv',
+    )
