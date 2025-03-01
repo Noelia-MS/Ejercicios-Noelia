@@ -71,3 +71,24 @@ container2.image('https://placehold.co/300x200', caption='Imagen 300x200')
 
 container2.write('Esto es otro texto')
 
+# st.write('''La escala de color de los diamantes utiliza letras para clasificarlos, 
+#          desde la letra D (incoloro) hasta la letra Z (amarillo claro).
+         
+#          Incoloro (D-F); Casi incoloro (G-J)
+#          Los colores de los diamantes se clasifican utilizando una escala que va desde la letra D hasta la Z,
+#         según el Instituto Gemológico de América (GIA), donde la letra "D" es totalmene incoloro y, por lo tanto, más valioso,
+         
+#          ''')
+
+# st.write('''Cortes de diamante de más a menos, según la calidad:
+
+# Ideal
+# Premium
+# Very Good
+# Good
+# Fair
+
+# El corte "Ideal" se considera el mejor, ya que maximiza el brillo del diamante. 
+# "Premium" también es excelente y tiene un rendimiento de luz muy cercano al "Ideal".
+# "Very Good" sigue siendo un corte de alta calidad, 
+# "Good" y "Fair" son cortes menos deseables en términos de brillo y proporción.''')

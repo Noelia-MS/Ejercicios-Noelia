@@ -12,10 +12,6 @@ def load_scikit_model():
     return joblib.load('./models/pipeline_regresion.joblib')
 
 model = load_scikit_model() 
-if 'predicciones_df' not in st.session_state:
-    st.session_state['predicciones_df'] = pd.DataFrame(columns=['carat', 'cut', 'color', 'clarity',
-                                        'depth', 'table', 'x', 'y', 'z', 
-                                        'precio_estimado'])
 
 st.title('Regresión')
 if st.button('Volver a inicio'):
@@ -26,11 +22,11 @@ st.header('Predicción del precio del diamante')
 
 # Mostrar datos
 st.write('Ejemplo de los datos')
-df= sns.load_dataset('diamonds')
-st.table(df.head())
+diamonds= sns.load_dataset('diamonds')
+st.table(diamonds.head())
 
 
-# Formulario para predicción
+# Formulario 
 st.header('Introduce los datos para la predicción')
 
 with st.form('mi_formulario'):
@@ -80,14 +76,3 @@ if boton_enviar:
     prediccion = model.predict(X_new)[0]
     st.metric('Precio estimado', value=f'{prediccion:.2f} $')
     X_new['precio_estimado'] = round(prediccion,2)
-    st.session_state['predicciones_df'] = pd.concat([st.session_state['predicciones_df'], X_new],
-                                                    ignore_index=True)
-
-
-    csv = st.session_state['predicciones_df'].to_csv(index=False).encode('utf-8')
-    st.download_button(
-        label="Descargar CSV de predicciones",
-        data=csv,
-        file_name='regresion_diamantes.csv',
-        mime='text/csv',
-    )
