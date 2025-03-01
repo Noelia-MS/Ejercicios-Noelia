@@ -82,5 +82,17 @@ if boton_enviar:
     prediccion = model.predict(X_new)[0]
     corte_estimado = label_encoder.inverse_transform([prediccion])[0]
     st.metric('Corte estimado', value=f'{corte_estimado}')
-    X_new['corte_estimado'] = corte_estimado
     
+    
+    # Guardar en CSV
+    # X_new['corte_estimado'] = corte_estimado
+    # archivo_csv = 'clasificacion_diamonds.csv'
+    # X_new.to_csv(archivo_csv, index=False)
+    
+    # with open(archivo_csv, 'rb') as file:
+    #     btn = st.download_button(
+    #         label='Descargar como CSV',
+    #         data=file,
+    #         file_name=archivo_csv,
+    #         mime='text/csv'
+    #     )

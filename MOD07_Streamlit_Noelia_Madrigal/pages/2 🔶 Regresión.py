@@ -75,4 +75,17 @@ if boton_enviar:
 
     prediccion = model.predict(X_new)[0]
     st.metric('Precio estimado', value=f'{prediccion:.2f} $')
-    X_new['precio_estimado'] = round(prediccion,2)
+    
+    # Guardar en CSV
+    
+    # X_new['precio_estimado'] = round(prediccion,2)
+    # archivo_csv = 'regresion_diamonds.csv'
+    # X_new.to_csv(archivo_csv, index=False)
+    
+    # with open(archivo_csv, 'rb') as file:
+    #     btn = st.download_button(
+    #         label='Descargar como CSV',
+    #         data=file,
+    #         file_name=archivo_csv,
+    #         mime='text/csv'
+    #     )
