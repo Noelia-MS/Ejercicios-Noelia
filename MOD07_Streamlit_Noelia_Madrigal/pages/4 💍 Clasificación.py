@@ -4,7 +4,7 @@ import seaborn as sns
 import joblib
 from sklearn.preprocessing import LabelEncoder
 
-st.set_page_config(page_title='Clasificación', page_icon=':diamond_shape_with_a_dot_inside:')
+st.set_page_config(page_title='Clasificación', page_icon=':ring:')
 
 st.title('Clasificación')
 if st.button('Volver a inicio'):

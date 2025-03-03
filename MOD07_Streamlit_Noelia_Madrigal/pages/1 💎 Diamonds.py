@@ -3,12 +3,17 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 
-
 st.set_page_config(page_title='Diamonds', page_icon=':gem:')
+
+st.title('Diamonds dataset')
+
+
+if st.button('Volver a inicio'):
+   st.switch_page('🏠Inicio.py')
 
 st.header('Características de los diamantes')
 
-st.image('https://damiancolombo.com/backoffice/images/1860-Educaci%C3%B3n%20-%20Diamantes.jpg', width=200)
+st.image('https://damiancolombo.com/backoffice/images/1860-Educaci%C3%B3n%20-%20Diamantes.jpg', width=250)
 
 st.subheader('El dataset se estructura en:')
 
@@ -42,10 +47,9 @@ with st.expander('¿Cómo se mide la pureza de los diamantes?'):
     st.write('''Por sus inclusiones, que son los defectos internos que afectan a la claridad.
              Se categorizan desde IF (sin inclusiones) hasta I1 (inclusiones visibles )''')
     
-
 if st.checkbox('Leído'):
     st.balloons()
 
     
-if st.button('Volver a inicio'):
-    st.switch_page('Inicio.py')
+if st.button('Ir a EDAs'):
+    st.switch_page('pages/2 📊 EDAs.py')

@@ -4,7 +4,7 @@ import seaborn as sns
 import joblib
 
 st.set_page_config(page_title='Regresión', 
-                   page_icon=':large_orange_diamond:')
+                   page_icon=':moneybag:')
 
 
 @st.cache_resource
