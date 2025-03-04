@@ -16,7 +16,7 @@ Este proyecto ha sido creado para aplicar los conocimientos adquiridos en el Boo
 de Hack a Boss, integrando los módulos de Python, Machine Learning y Streamlit.
 
 La aplicación web interactiva permite al usuario navegar entre las distintas secciones, 
-visualizar un análisis personalizado mediante la apliación de filtros y obtener predicciones
+visualizar un análisis personalizado mediante la aplicación de filtros y obtener predicciones
 basadas en modelos de machine learning previamente entrenados.
 
 
