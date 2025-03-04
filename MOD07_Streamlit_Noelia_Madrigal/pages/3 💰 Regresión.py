@@ -89,3 +89,6 @@ if boton_enviar:
     #         file_name=archivo_csv,
     #         mime='text/csv'
     #     )
+
+if st.button('Ir a clasificación'):
+    st.switch_page('pages/4 💍 Clasificación.py')

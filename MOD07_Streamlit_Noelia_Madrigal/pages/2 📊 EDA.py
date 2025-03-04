@@ -4,7 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import plotly.express as px
 
-st.set_page_config(page_title='EDAs', page_icon=':bar_chart:')
+st.set_page_config(page_title='EDA', page_icon=':bar_chart:')
 
 
 st.title('Análisis Exploratorio de Datos')
@@ -46,26 +46,49 @@ if clicked:
 st.subheader('Estadísticas de las variables numéricas')
 st.write(df.describe().round(2))
 
+# Filtros categóricos
+st.subheader('Filtros')
+
+# Filtro por corte
+cortes = df['corte'].unique().tolist()
+selected_cortes = st.multiselect('Selecciona uno o varios cortes:', options=cortes, default=cortes)
+
+# Filtro por color
+colores = df['color'].unique().tolist()
+selected_colores = st.multiselect('Selecciona uno o varios colores:', options=colores, default=colores)
+
+# Filtro por claridad
+claridad = df['claridad'].unique().tolist()
+selected_claridad = st.multiselect('Selecciona uno o varios tipos de claridad:',
+                                   options=claridad, default=claridad)
+
+df_filtered = df[
+    (df['corte'].isin(selected_cortes)) & 
+    (df['color'].isin(selected_colores)) &
+    (df['claridad'].isin(selected_claridad))
+]
+
 # Gráficos univariante
 st.header('Análisis univariante')
 st.subheader('🔢 Numéricas')
 num_feature = st.selectbox('Selecciona la característica numérica a analizar:', 
                            ['precio', 'quilate', 'profundidad', 'mesa', 'x', 'y', 'z'])
+# Filtro numérico
+min_value, max_value = st.slider(f'Selecciona el intervalo para filtrar por {num_feature}:',
+                                 df[num_feature].min(), df[num_feature].max(), 
+                                 (df[num_feature].min(), df[num_feature].max()))
 
 st.subheader('🅰️ Categóricas')
 cat_feature = st.radio('Selecciona la característica categórica a analizar:', 
                        ['corte', 'color', 'claridad'])
 
-min_value, max_value = st.slider(f'Selecciona el rango para {num_feature}:',
-                                 df[num_feature].min(), df[num_feature].max(), 
-                                 (df[num_feature].min(), df[num_feature].max()))
+df_final = df_filtered[(df_filtered[num_feature] >= min_value) &
+                          (df_filtered[num_feature] <= max_value)]
 
-df_num_filt = df[(df[num_feature] >= min_value) & (df[num_feature] <= max_value)]
-df_filtered= df_num_filt[[num_feature, cat_feature]]
 
     # Histograma
 fig, ax= plt.subplots(figsize=(6,4))
-sns.histplot(df_filtered[num_feature], ax=ax, bins=30, edgecolor='black')
+sns.histplot(df_final[num_feature], ax=ax, bins=30, edgecolor='black')
 ax.set_title(f'Histograma de {num_feature}')
 ax.set_xlabel(num_feature)
 ax.set_ylabel('Frecuencia')
@@ -73,7 +96,7 @@ st.pyplot(fig)
 
     # KDEplot
 fig, ax = plt.subplots(figsize=(6, 4))
-sns.kdeplot(df_filtered[num_feature], ax=ax, shade=True)
+sns.kdeplot(df_final[num_feature], ax=ax, shade=True)
 ax.set_title(f'Curva de densidad de {num_feature}')
 ax.set_xlabel(num_feature)
 ax.set_ylabel('Densidad')
@@ -81,20 +104,20 @@ st.pyplot(fig)
 
     # Boxplot
 fig, ax = plt.subplots(figsize=(6, 4))
-sns.boxplot(df_filtered[num_feature], ax=ax, showmeans=True)
+sns.boxplot(df_final[num_feature], ax=ax, showmeans=True)
 ax.set_title(f'Boxplot de {num_feature}')
 ax.set_xlabel(num_feature)
 ax.set_ylabel('Valor')
 st.pyplot(fig)
 
     # Pie categórico
-fig = px.pie(df_filtered, names=cat_feature, title=f'Distribución de {cat_feature}')
+fig = px.pie(df_final, names=cat_feature, title=f'Distribución de {cat_feature}')
 st.plotly_chart(fig)
 
 # Gráficos bivariantes
 st.header('Análisis bivariante')
     # Gráfico de barras
-df_biv_mean = df_filtered.groupby(cat_feature).agg(mean_value=(num_feature, 'mean')).reset_index()
+df_biv_mean = df_final.groupby(cat_feature).agg(mean_value=(num_feature, 'mean')).reset_index()
 fig = px.bar(df_biv_mean, x=cat_feature, y='mean_value',
              title=f'{num_feature.capitalize()} por {cat_feature}', 
              labels={'mean_value': f'{num_feature} promedio'})
@@ -111,46 +134,33 @@ if len(selected_features) == 2:
     x_feature = selected_features[0]
     y_feature = selected_features[1]
 
-    fig = px.scatter(df, x=x_feature, y=y_feature, color=cat_feature,
+    fig = px.scatter(df_final, x=x_feature, y=y_feature, color=cat_feature,
                      title=f'Gráfico de dispersión de {x_feature.capitalize()} vs {y_feature.capitalize()} por {cat_feature}',
                      labels={x_feature: x_feature.capitalize(), y_feature: y_feature.capitalize()})
     st.plotly_chart(fig)
 else:
-    st.write("Por favor, selecciona al menos dos características para el gráfico de dispersión.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # Scatter
-# fig, ax= plt.subplots(figsize= (6,4))
-# sns.scatterplot(df.sample(2000), x='quilate', y='precio', hue='corte', ax=ax)
-# ax.set_title('Relación entre precio y quilates')
-# ax.set_xlabel('quilates')
-# ax.set_ylabel('precio')
-# ax.legend()
-# st.pyplot(fig)
+    st.write('Por favor, selecciona dos características.')
 
     # Heatmap
-fig, ax = plt.subplots(figsize=(6, 4))
-sns.heatmap(df.corr(numeric_only=True).round(2), annot=True, cmap='rainbow', ax=ax)
+fig, ax = plt.subplots()
+sns.heatmap(df_final.corr(numeric_only=True).round(2), annot=True, cmap='rainbow', ax=ax)
 ax.set_title('Mapa de la relación entre las variables')
 st.pyplot(fig)
 
+
     # Pairplot
-fig= sns.pairplot(df.sample(500), hue='corte', palette='viridis')
-st.pyplot(fig)
+df_final['xyz'] = df_final['x'] * df_final['y'] * df_final['z']
+fig = px.scatter_matrix(df_final.sample(500), 
+                        dimensions=['quilate', 'precio', 'profundidad', 'mesa', 'xyz'],
+                        color= 'corte',
+                        title='Matriz de dispersión de las variables numéricas')
+fig.update_layout(width=600, height=600)
+st.plotly_chart(fig)
 
 
 
+
+st.write(f'Datos eliminados con los filtros aplicados: **{df.shape[0] - df_final.shape[0]}**')
 
 st.subheader('Descarga el dataset original o con los filtros actuales')
 
@@ -167,7 +177,7 @@ with col1:
 with col3:    
     st.download_button(
         'Descargar datos filtrados',
-        data=df_filtered.to_csv(index=False), 
+        data=df_final.to_csv(index=False), 
         file_name='diamonds_filtered.csv',
         mime='text/csv'
     )

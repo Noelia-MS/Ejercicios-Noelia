@@ -52,4 +52,4 @@ if st.checkbox('Leído'):
 
     
 if st.button('Ir a EDAs'):
-    st.switch_page('pages/2 📊 EDAs.py')
+    st.switch_page('pages/2 📊 EDA.py')
