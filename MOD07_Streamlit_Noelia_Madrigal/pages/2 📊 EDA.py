@@ -79,41 +79,39 @@ cat_feature = st.sidebar.radio('🅰️ Selecciona la característica categóric
 df_final = df_filtered[(df_filtered[num_feature] >= min_value) &
                           (df_filtered[num_feature] <= max_value)]
 
-st.subheader('Tipo de análisis')
+st.subheader('Análisis gráfico')
+st.markdown(''' Los gráficos son dinámicos y se actualizarán según la variable que se seleccione
+            en el panel lateral.''')
 
 # Gráficos univariantes
 with st.expander('Univariante'):
-        # Histograma
-    fig, ax= plt.subplots(figsize=(6,4))
-    sns.histplot(df_final[num_feature], ax=ax, bins=30, edgecolor='black')
-    ax.set_title(f'Histograma de {num_feature}')
-    ax.set_xlabel(num_feature)
-    ax.set_ylabel('Frecuencia')
-    st.pyplot(fig)
+    tab1, tab2, tab3, tab4 = st.tabs(["Histograma", "Curva de Densidad", "Boxplot", "Pie"])
 
-        # KDEplot
-    fig, ax = plt.subplots(figsize=(6, 4))
-    sns.kdeplot(df_final[num_feature], ax=ax, shade=True)
-    ax.set_title(f'Curva de densidad de {num_feature}')
-    ax.set_xlabel(num_feature)
-    ax.set_ylabel('Densidad')
-    st.pyplot(fig)
+    with tab1:
+        fig, ax = plt.subplots(figsize=(6, 4))
+        sns.histplot(df_final[num_feature], ax=ax, bins=30, edgecolor='black')
+        ax.set_title(f'Histograma de {num_feature}')
+        st.pyplot(fig)
 
-        # Boxplot
-    fig, ax = plt.subplots(figsize=(6, 4))
-    sns.boxplot(df_final[num_feature], ax=ax, showmeans=True)
-    ax.set_title(f'Boxplot de {num_feature}')
-    ax.set_xlabel(num_feature)
-    ax.set_ylabel('Valor')
-    st.pyplot(fig)
+    with tab2:
+        fig, ax = plt.subplots(figsize=(6, 4))
+        sns.kdeplot(df_final[num_feature], ax=ax, shade=True)
+        ax.set_title(f'Curva de densidad de {num_feature}')
+        st.pyplot(fig)
 
-        # Pie categórico
-    fig = px.pie(df_final, names=cat_feature, title=f'Distribución de {cat_feature}')
-    st.plotly_chart(fig)
+    with tab3:
+        fig, ax = plt.subplots(figsize=(6, 4))
+        sns.boxplot(df_final[num_feature], ax=ax, showmeans=True)
+        ax.set_title(f'Boxplot de {num_feature}')
+        st.pyplot(fig)
+
+    with tab4:
+        fig = px.pie(df_final, names=cat_feature, title=f'Distribución de {cat_feature}')
+        st.plotly_chart(fig)
+
 
 # Gráficos bivariantes
 with st.expander('Bivariante'):
-        # Gráfico de barras
     df_biv_mean = df_final.groupby(cat_feature).agg(mean_value=(num_feature, 'mean')).reset_index()
     fig = px.bar(df_biv_mean, x=cat_feature, y='mean_value',
                 title=f'{num_feature.capitalize()} por {cat_feature}', 
@@ -123,48 +121,50 @@ with st.expander('Bivariante'):
 
 # Gráficos multivariantes
 with st.expander('Multivariante'):
-    selected_features = st.multiselect('Selecciona dos características numéricas para el gráfico de dispersión:', 
-                                    ['precio', 'quilate', 'profundidad', 'mesa', 'x', 'y', 'z'], 
-                                    default=['precio', 'quilate'])
+    tab1, tab2, tab3 = st.tabs(['Scatter', 'Heatmap', 'Pairplot'])
+    with tab1:
+        selected_features = st.multiselect('Selecciona dos características numéricas para el gráfico de dispersión:', 
+                                        ['precio', 'quilate', 'profundidad', 'mesa', 'x', 'y', 'z'], 
+                                        default=['precio', 'quilate'])
 
-    if len(selected_features) == 2:
-        x_feature = selected_features[0]
-        y_feature = selected_features[1]
+        if len(selected_features) == 2:
+            x_feature = selected_features[0]
+            y_feature = selected_features[1]
 
-        fig = px.scatter(df_final, x=x_feature, y=y_feature, color=cat_feature,
-                        title=f'Gráfico de dispersión de {x_feature.capitalize()} vs {y_feature.capitalize()} por {cat_feature}',
-                        labels={x_feature: x_feature.capitalize(), y_feature: y_feature.capitalize()})
+            fig = px.scatter(df_final, x=x_feature, y=y_feature, color=cat_feature,
+                            title=f'Gráfico de dispersión de {x_feature.capitalize()} vs {y_feature.capitalize()} por {cat_feature}',
+                            labels={x_feature: x_feature.capitalize(), y_feature: y_feature.capitalize()})
+            st.plotly_chart(fig)
+        else:
+            st.write('Por favor, selecciona dos características.')
+
+    with tab2:
+        fig, ax = plt.subplots()
+        sns.heatmap(df_final.corr(numeric_only=True).round(2), annot=True, cmap='rainbow', ax=ax)
+        ax.set_title('Mapa de la relación entre las variables')
+        st.pyplot(fig)
+
+
+    with tab3:      
+        fig = px.scatter_matrix(df_final.sample(500).assign(xyz=lambda df: df['x'] * df['y'] * df['z']), 
+                                dimensions=['quilate', 'precio', 'profundidad', 'mesa', 'xyz'],
+                                color=cat_feature,
+                                title=f'Matriz de dispersión de las variables numéricas agrupadas por {cat_feature}')
+        fig.update_layout(width=600, height=600)
         st.plotly_chart(fig)
-    else:
-        st.write('Por favor, selecciona dos características.')
-
-        # Heatmap
-    fig, ax = plt.subplots()
-    sns.heatmap(df_final.corr(numeric_only=True).round(2), annot=True, cmap='rainbow', ax=ax)
-    ax.set_title('Mapa de la relación entre las variables')
-    st.pyplot(fig)
-
-
-        # Pairplot
-    fig = px.scatter_matrix(df_final.sample(500).assign(xyz=lambda df: df['x'] * df['y'] * df['z']), 
-                            dimensions=['quilate', 'precio', 'profundidad', 'mesa', 'xyz'],
-                            color='corte',
-                            title='Matriz de dispersión de las variables numéricas')
-    fig.update_layout(width=600, height=600)
-    st.plotly_chart(fig)
 
 
 
 st.write(f'Datos eliminados con los filtros aplicados: **{df.shape[0] - df_final.shape[0]}**')
 
 
-st.subheader('💾 Descarga el dataset original o con los filtros actuales')
+st.subheader('Descarga el dataset original o con los filtros actuales')
 
 col1, col2, col3 = st.columns(3, vertical_alignment='center')
 
 with col1:
     st.download_button(
-        '📥Descargar datos originales',
+        '💾Descargar datos originales',
         data=df.to_csv(index=False),
         file_name='diamonds.csv',
         mime='text/csv'
@@ -172,7 +172,7 @@ with col1:
     
 with col3:    
     st.download_button(
-        '📥Descargar datos filtrados',
+        '💾Descargar datos filtrados',
         data=df_final.to_csv(index=False), 
         file_name='diamonds_filtered.csv',
         mime='text/csv'

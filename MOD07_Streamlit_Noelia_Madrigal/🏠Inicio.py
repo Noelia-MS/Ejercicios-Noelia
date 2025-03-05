@@ -6,7 +6,7 @@ st.title('Proyecto de análisis de datos y Machine Learning en Streamlit')
 st.write("\n")
 st.write("\n")
 
-st.subheader('Aplicación de EDA, regresión y clasificación')
+st.subheader('EDA y modelado predictivo aplicado al dataset de Diamonds.')
 
 st.write("\n")
 
